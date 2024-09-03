@@ -2,8 +2,7 @@ extern crate alloc;
 
 use core::alloc::Layout;
 
-#[allow(unused)]
-fn to_array_result(arr: &[u8]) -> *mut u8 {
+pub fn to_array_result(arr: &[u8]) -> *mut u8 {
     let mut new_vec = (arr.len() as u64).to_le_bytes().to_vec();
 
     new_vec.append(&mut arr.to_vec());
@@ -31,10 +30,16 @@ macro_rules! main_from {
     ( $f:ident ) => {
         #[no_mangle]
         pub extern "C" fn main(ptr: *mut u8, len: usize) -> i32 {
-            let slice = unsafe { std::slice::from_raw_parts(ptr, len) };
-            let v: Value = serde_json::from_slice(slice).unwrap();
+            extern crate alloc;
 
-            let result = f(v);
+            use core::alloc::Layout;
+            use onefmt_plugin_utils::interface::to_array_result;
+            use serde_json;
+
+            let slice = unsafe { std::slice::from_raw_parts(ptr, len) };
+            let v = serde_json::from_slice(slice).unwrap();
+
+            let result = $f(v);
 
             let b = serde_json::to_vec(&result).unwrap();
             let result = b.as_slice();
