@@ -13,27 +13,30 @@ macro_rules! onefmt_plugin_setup {
         }
 
         #[no_mangle]
-        pub unsafe extern "C" fn of_malloc(size: u32, alignment: u32) -> *mut u8 {
+        pub unsafe extern "C" fn of_malloc(size: u64, alignment: u64) -> u64 {
             extern crate alloc;
 
             use core::alloc::Layout;
 
             let layout = Layout::from_size_align_unchecked(size as usize, alignment as usize);
-            alloc::alloc::alloc(layout)
+            alloc::alloc::alloc(layout) as u64
         }
 
         #[no_mangle]
-        pub unsafe extern "C" fn of_free(ptr: *mut u8, size: u32, alignment: u32) {
+        pub unsafe extern "C" fn of_free(ptr: u64, size: u64, alignment: u64) {
             extern crate alloc;
 
             use core::alloc::Layout;
 
             let layout = Layout::from_size_align_unchecked(size as usize, alignment as usize);
-            alloc::alloc::dealloc(ptr, layout);
+            alloc::alloc::dealloc(ptr as *mut u8, layout);
         }
 
         #[no_mangle]
-        pub extern "C" fn main(ptr: *mut u8, len: usize) -> i32 {
+        pub extern "C" fn main(ptr: u64, len: u64) -> u64 {
+            let ptr = ptr as *mut u8;
+            let len = len as usize;
+
             use serde_json;
 
             let slice = unsafe { std::slice::from_raw_parts(ptr, len) };
@@ -45,32 +48,8 @@ macro_rules! onefmt_plugin_setup {
             let result = b.as_slice();
 
             let result = to_array_result(result);
-            result as i32
-        }
-    };
-}
 
-#[macro_export]
-macro_rules! main_from {
-    ( $f:ident ) => {
-        #[no_mangle]
-        pub extern "C" fn main(ptr: *mut u8, len: usize) -> i32 {
-            extern crate alloc;
-
-            use core::alloc::Layout;
-            use onefmt_plugin_utils::interface::to_array_result;
-            use serde_json;
-
-            let slice = unsafe { std::slice::from_raw_parts(ptr, len) };
-            let v = serde_json::from_slice(slice).unwrap();
-
-            let result = $f(v);
-
-            let b = serde_json::to_vec(&result).unwrap();
-            let result = b.as_slice();
-
-            let result = to_array_result(result);
-            result as i32
+            result as u64
         }
     };
 }
