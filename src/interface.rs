@@ -1,5 +1,5 @@
 #[macro_export]
-macro_rules! onefmt_plugin_setup {
+macro_rules! foro_plugin_setup {
     ( $f:ident ) => {
         pub fn to_array_result(arr: &[u8]) -> *mut u8 {
             let mut new_vec = (arr.len() as u64).to_le_bytes().to_vec();

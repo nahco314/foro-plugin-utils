@@ -1,5 +1,5 @@
 [package]
-name = "onefmt-plugin-utils"
+name = "foro-plugin-utils"
 version = "0.1.0"
 edition = "2021"
 
