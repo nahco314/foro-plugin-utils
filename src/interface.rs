@@ -13,7 +13,7 @@ macro_rules! foro_plugin_setup {
         }
 
         #[no_mangle]
-        pub unsafe extern "C" fn of_malloc(size: u64, alignment: u64) -> u64 {
+        pub unsafe extern "C" fn foro_malloc(size: u64, alignment: u64) -> u64 {
             extern crate alloc;
 
             use core::alloc::Layout;
@@ -23,7 +23,7 @@ macro_rules! foro_plugin_setup {
         }
 
         #[no_mangle]
-        pub unsafe extern "C" fn of_free(ptr: u64, size: u64, alignment: u64) {
+        pub unsafe extern "C" fn foro_free(ptr: u64, size: u64, alignment: u64) {
             extern crate alloc;
 
             use core::alloc::Layout;
@@ -33,7 +33,7 @@ macro_rules! foro_plugin_setup {
         }
 
         #[no_mangle]
-        pub extern "C" fn main(ptr: u64, len: u64) -> u64 {
+        pub extern "C" fn foro_main(ptr: u64, len: u64) -> u64 {
             let ptr = ptr as *mut u8;
             let len = len as usize;
 
